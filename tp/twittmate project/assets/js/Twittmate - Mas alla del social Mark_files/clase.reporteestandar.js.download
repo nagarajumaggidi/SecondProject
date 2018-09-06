@@ -1,0 +1,175 @@
+var seleccion_multiple = false;
+var seleccionados = new Array();
+
+addLoadEvent(Index);
+
+function Index()
+{
+	$( "#busqueda" ).dialog({
+		autoOpen: false,
+		//height: 400,
+		width: 800,
+		title:"Filtros",
+		modal: true,
+		buttons: {        
+			"Cancelar": function() {
+				$( this ).dialog( "close" );   
+			}, 
+			"Enviar": function() {
+				document.getElementById("Busqueda").submit();  
+			}
+		},
+		close: function() {
+			
+		}
+    });
+}
+
+function CargarFormulario(idformulario, id)
+{
+    if(id == "" || id == " ")
+    {
+        alert("Seleccione un registro haciendo click encima de la fila")
+        return ;
+    }
+    
+	if(document.getElementById(idformulario).op.value == "BorrarRegistro")
+	{
+		ConfirmaBorrar(idformulario, id)
+		return ;
+	}
+	
+	document.getElementById(idformulario).idregistro.value = id
+    
+	document.getElementById(idformulario).submit();
+}
+
+function MostrarBusqueda()
+{
+	//var left = (screen.width-550)/2;
+		
+	//document.getElementById('busqueda').style.left = left + 'px'
+	
+	$("#busqueda").show();
+	$("#busqueda").dialog( "open" );
+	
+}
+
+function CambiarPagina(pag)
+{
+	document.getElementById('FormPaginacion').pagina.value = pag
+	document.getElementById('FormPaginacion').submit()
+}
+
+function CambiarPaginaWeb(pag, idform)
+{
+    document.getElementById('pagina'+idform).value = pag
+    document.getElementById('FormPaginacion'+idform).submit()
+}
+
+function Ordenar(ordenar, ordenarpor)
+{
+    document.getElementById('Ordenamiento').ordenar.value = ordenar 
+    document.getElementById('Ordenamiento').ordenarpor.value = ordenarpor
+	document.getElementById('Ordenamiento').submit()
+}
+
+function ConfirmaBorrar(idformulario, id)
+{
+	var respuesta=confirm('¿Realmente desea borrar este registro?')					
+	if (respuesta==true)
+	{
+		document.getElementById(idformulario).idregistro.value = id;
+		document.getElementById(idformulario).submit()
+	}			
+}
+
+function ExportarResultado()
+{
+	document.getElementById('FormExportarResultado').submit()
+}
+
+function Imprimir()
+{
+	VentanaImprimir()
+	document.getElementById('FormImprimir').submit()
+}
+
+function SeleccionarRegistro(idregistro)
+{
+    if(seleccion_multiple)
+    {
+        SeleccionMultiple(idregistro)
+        return;
+    }
+    
+    if(document.getElementById("fila"+document.getElementById("FormVarios").idregistro.value))
+        document.getElementById("fila"+document.getElementById("FormVarios").idregistro.value).className = "fila-contenido"
+        
+    document.getElementById("FormVarios").idregistro.value = idregistro;
+    document.getElementById("fila"+idregistro).className = "seleccionada"
+}
+
+
+function RegistroSeleccionado()
+{
+    return document.getElementById("FormVarios").idregistro.value
+}
+
+function SeleccionMultiple(idregistro)
+{                       
+    if(detectItem(seleccionados, idregistro))
+    {           
+        removeItem(seleccionados, idregistro)
+        document.getElementById("fila"+idregistro).className = "fila-contenido"
+        document.getElementById("FormVarios").idregistro.value = ImplodeSeleccionados(seleccionados)
+        return;
+    }
+    
+    seleccionados[idregistro] = idregistro 
+    document.getElementById("FormVarios").idregistro.value = ImplodeSeleccionados(seleccionados)            
+    document.getElementById("fila"+idregistro).className = "seleccionada"
+}
+
+function removeItem(originalArray, itemToRemove) {
+    var j = 0;
+    while (j < originalArray.length) {
+    //    alert(originalArray[j]);
+        if (originalArray[j] == itemToRemove) {
+            originalArray.splice(j, 1);
+    } else { j++; }
+}
+}
+
+function detectItem(originalArray, itemToDetect) {
+    var j = 0;
+    while (j < originalArray.length) {
+        if (originalArray[j] == itemToDetect) {
+            return true;
+        } else { j++; }        
+    }
+    return false;
+}
+
+function ImplodeSeleccionados(seleccionados)
+{
+    var contenido = "";
+    var separador = ",";
+        
+    i=0;
+    for (x in seleccionados)
+    {           
+        if(i==0)
+            separador = "";
+        else
+            separador = ",";
+        
+        if(x != "")
+        {
+            contenido = contenido + "" +separador +""+ x;
+            i++;
+        }
+            
+    }                
+    return contenido;
+}

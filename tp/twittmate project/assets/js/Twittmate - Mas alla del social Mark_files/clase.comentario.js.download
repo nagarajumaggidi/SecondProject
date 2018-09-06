@@ -1,0 +1,209 @@
+
+jQuery(document).ready(function() {
+	
+		$(".borrar-comentario").click(function(){
+			var idcomentario = $(this).attr("rel")
+			
+			$.ajax({
+				type: "POST",
+				url: "Comentario.php",
+				cache: false,
+				data: "op=BorrarComentario&noheaders=all&idcomentario="+idcomentario,
+				success: function(datos){
+				   alert(datos);  
+				   var inf = document.getElementById('inf').value
+				   $("#lista-comentarios").load("Comentario.php?op=MostrarComentarios&noheaders=all&limite=ok&inf="+inf).hide().fadeIn('slow')                                                     				   
+				}
+			});
+    
+			
+			return false;
+		});
+});
+
+function GuardarComentario()
+{
+     var inf = document.getElementById('inf').value
+     var autor = document.getElementById('autor').value  
+     var comentario = document.getElementById('comentario').value  
+     var verificacion = document.getElementById('verificacion_comentario').value    
+     var idafiliado = document.getElementById('idafiliado').value    
+     var idcomentario = document.getElementById('idcomentario').value    
+	 var correo = document.getElementById('correo').value 
+
+     PeticionGuardarComentario(inf, autor, comentario, verificacion, idafiliado, idcomentario, correo) 
+}
+
+function PeticionGuardarComentario(inf, autor, comentario, verificacion, idafiliado, idcomentario, correo)
+{
+    var _objetus = objetus()  
+  
+    _values_send =  "op=NuevoComentario"
+    _values_send += "&noheaders=all"  
+    _values_send += "&inf="+inf
+    _values_send += "&autor="+autor
+    _values_send += "&comentario="+comentario  
+    _values_send += "&verificacion_comentario="+verificacion            
+    _values_send += "&idafiliado="+idafiliado
+    _values_send += "&idcomentario="+idcomentario 
+	_values_send += "&correo="+correo 
+    _values_send += "&timestamp="+FechaHora()  
+
+    _URL_= "Comentario.php"        
+    dir = _URL_                   
+	    
+    _objetus.open("POST", dir, true);
+    
+    _objetus.onreadystatechange=function() 
+        {
+        if(_objetus.readyState==1 || _objetus.readyState==2 || _objetus.readyState==3)
+            CargandoGuardarComentario()
+            
+        if(_objetus.readyState==4)
+            FinalizarGuardarComentario(_objetus.status, _objetus.responseText, inf)    
+        }     
+    
+    _objetus.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    _objetus.setRequestHeader("Content-length", _values_send.length);
+    _objetus.setRequestHeader("Connection", "close");
+
+    _objetus.send(_values_send);       
+}
+
+
+function CargandoGuardarComentario()    
+{
+
+}
+
+
+function FinalizarGuardarComentario(respuesta, texto, inf)    
+{   
+	if(document.getElementById("imagenverificacion"))
+	{    
+		 tmp = document.getElementById("imagenverificacion").src
+		 document.getElementById("imagenverificacion").src = ""
+		 document.getElementById("imagenverificacion").src = tmp+"&timestamp="+FechaHora()   
+	}
+
+    if(respuesta == 200)
+    {   
+        document.getElementById('idcomentario').value = "0"             
+
+		$.ajax({
+			type: "POST",
+			url: "Comentario.php",
+			cache: false,
+			data: "op=MostrarComentarios&noheaders=all&limite=ok&inf="+inf,
+			success: function(datos){
+			   $("#lista-comentarios").html(datos)
+			   EstablecerEventoBorrar()
+			}
+		});
+			
+		
+         if(document.getElementById('form-comentario'))
+             document.getElementById('form-comentario').reset()		
+		
+         alert(texto) 				         
+    }    
+    
+}    
+
+function EscribirSubComentario(idcomentario)
+{       
+    document.location = "#anc-comentario";
+    document.getElementById('comentario').innerHTML = "Escribe aqui tu comentario..."
+    document.getElementById('idcomentario').value = idcomentario
+}
+
+function EstablecerEventoBorrar()
+{
+	$(".borrar-comentario").click(function(){
+		var idcomentario = $(this).attr("rel")
+		
+		$.ajax({
+			type: "POST",
+			url: "Comentario.php",
+			cache: false,
+			data: "op=BorrarComentario&noheaders=all&idcomentario="+idcomentario,
+			success: function(datos){
+			   alert(datos);  
+			   var inf = document.getElementById('inf').value
+			   $("#lista-comentarios").load("Comentario.php?op=MostrarComentarios&noheaders=all&limite=ok&inf="+inf).hide().fadeIn('slow')                                                     				   
+			   EstablecerEventoBorrar()
+			}
+		});
+
+		
+		return false;
+	});
+}
+
+
+function GuardarSugerencia()
+{
+     var inf = document.getElementById('inf').value
+	 var sugerencia = document.getElementById('sugerencia').value
+	 
+	 if(sugerencia.length == 0)
+	 {
+		 alert("Debe escribir una sugerencia")
+		 return false;
+	 }
+    
+     PeticionGuardarSugerencia(inf, sugerencia) 
+}
+
+function PeticionGuardarSugerencia(inf, sugerencia)
+{
+    var _objetus = objetus()  
+    
+    _values_send =  "op=NuevaSugerencia"
+    _values_send += "&noheaders=all"  
+    _values_send += "&inf="+inf    
+	_values_send += "&sugerencia="+sugerencia 
+    _values_send += "&timestamp="+FechaHora()  
+
+    _URL_= "Comentario.php"        
+    dir = _URL_                   
+    
+    _objetus.open("POST", dir, true);
+    
+    _objetus.onreadystatechange=function() 
+        {
+        if(_objetus.readyState==1 || _objetus.readyState==2 || _objetus.readyState==3)
+            CargandoGuardarSugerencia()
+            
+        if(_objetus.readyState==4)
+            FinalizarGuardarSugerencia(_objetus.status, _objetus.responseText, inf)    
+        }     
+    
+    _objetus.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    _objetus.setRequestHeader("Content-length", _values_send.length);
+    _objetus.setRequestHeader("Connection", "close");
+
+    _objetus.send(_values_send);       
+}
+
+
+function CargandoGuardarSugerencia()    
+{
+   
+}
+
+
+function FinalizarGuardarSugerencia(respuesta, texto, inf)    
+{       
+    
+    if(respuesta == 200)
+    { 
+        alert(texto)
+		$("#sugerencia").val("")
+		$(".formulario.sugerencia").hide()
+         
+    }    
+    
+}    
+
+

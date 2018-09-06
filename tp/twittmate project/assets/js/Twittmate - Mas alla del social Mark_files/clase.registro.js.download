@@ -1,0 +1,122 @@
+
+
+$(document).ready(function () {
+    CargarOpcionesRegistro()
+
+});
+
+
+
+function CargarOpcionesRegistro()
+{
+    var visitortime = new Date();
+    var visitortimezone = -visitortime.getTimezoneOffset() * 60;
+    $("#zonahoraria").val(visitortimezone)
+
+    //Ventana registro
+    $("#ventana-registro").dialog({
+        autoOpen: false,
+        height: 460,
+        width: 780,
+        modal: true
+    });
+
+    $("#ventana-registro").show()
+
+    //Botones comprar de paquetes
+    $(".paquetes .comprar").click(function () {
+        $("#ventana-registro").dialog("open");
+        $("#idpaquete").val($(this).attr("data-idpaquete"));
+        return false;
+    });
+
+    $(".linkpaquete").click(function () {
+
+        if ($(this).attr("data-idpaquete").length == 0)
+            return;
+
+        $("#ventana-registro").dialog("open");
+        $("#idpaquete").val($(this).attr("data-idpaquete"))
+        return false;
+    });
+
+    //Enviar Formulario de registro
+    $("#registrar-referido").submit(function () {
+
+        if (!$("#acepto_terminos").is(":checked"))
+        {
+            alert("Debe Leer y Aceptar los Terminos y Condiciones")
+            return false;
+        }
+
+        document.getElementById("registrar-referido").submit()
+
+        /*
+         
+         if($("#contrasena").val() ==" " || $("#confirmar_contrasena").val() == "")
+         {
+         alert("Debe escribir una contraseña y su verificación")
+         return false;
+         }
+         
+         if($("#contrasena").val() != $("#confirmar_contrasena").val())
+         {
+         alert("Las contraseñas deben coincidir")
+         return false;
+         }
+         */
+
+        /*
+         
+         $.ajax({
+         type: "POST",
+         url: $("#ruta").val()+"/Registro.php",
+         dataType:'json',
+         data: "op=ValidarRegistrarReferido&noheaders=all&correoelectronico="+$("#correoelectronico").val(),
+         success: function(datos){
+         
+         if(datos.resultado == "Repetido")
+         alert("El correo electrónico ya se encuentra registrado")
+         else 
+         document.getElementById("registrar-referido").submit()
+         
+         }
+         });
+         */
+
+        return false;
+
+    });
+
+    if ($("#iniciaraqui").val() == "ok")
+    {
+        $("#ventana-iniciaraqui").dialog({
+            autoOpen: false,
+            height: 460,
+            width: 780,
+            modal: true,
+            buttons: {
+                'Cancelar': function () {
+                    $(this).dialog("close");
+                },
+                'Ver Cuentas de Twitter (No recomendado)': function () {
+                    location.href = "perfiles"
+                },
+                'Iniciar Entrenamiento': function () {
+                    location.href = "Nivel.php?inf=e2UrQX1rSnpvcjh2RFFDUEsYFw%2C%2C"
+                }
+            }
+        });
+    }
+
+    $("#cabecera .empezar a").click(function () {
+        $("#ventana-iniciaraqui").dialog("open")
+
+        if ($("#iniciaraqui").val() == "ok")
+            return false;
+
+
+    });
+}
+
+

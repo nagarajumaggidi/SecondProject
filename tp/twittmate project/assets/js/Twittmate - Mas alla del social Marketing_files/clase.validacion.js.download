@@ -1,0 +1,900 @@
+function Validaciones()
+{
+	/* propiedades */
+	this.error           		= new Boolean();           	//boolean que controla si ha habido error, Se inicializa a false cuando no pasas ningún valor al constructor
+	this.errorInterno    		= new Boolean();           	//boolean que controla si ha habido error interno, Se inicializa a false cuando no pasas ningún valor al constructor
+	this.msgError     	 		= new Array();
+	this.msgCorrecto     		= new String();  			//Cadena que contiene el mensaje que indica que no ha habido ningun error.
+	this.msgErrorInterno 		= new String();  			//error interno de la clase
+	this.errorClassName  		= "FieldErr";              	//estilo css que pasará a tener el campo en caso de encontrar error
+	this.formatoHora     		= "24";                    	//validaciones de hora, solo puede valer  "24" o "12"
+	this.formatoFecha    		= "EURO";                  	//Validaciones de fecha, puede valer "EURO", "ISO" y "ANSI"
+	this.prueba 				= new String();
+	this.campos					= new Array();
+
+	//metodos
+	this.EliminarError    		= EliminarError;
+	this.AgregarError     		= AgregarError;
+	this.mal 					= new Boolean();
+	this.mensajeError         	= mensajeError;
+	this.mensajeErrorInterno  	= mensajeErrorInterno;
+
+	/* Metodos que se utilizan para validar formularios */
+	this.campoVacio         	= campoVacio;     			//parametros: idCampo, msg, css
+	this.Url         			= Url;     	
+	this.campoVacioHtml			= campoVacioHtml;
+	//this.RegistroUnico		= RegistroUnico
+	this.Email              	= Email;          			//parametros: idCampo, msg, css
+	this.longitudCampo      	= longitudCampo;  			//parametros: idCampo, operador, longitud, msg,  css
+	this.camposIguales      	= camposIguales;  			//parametros: idCampo1, idCampo2, msg, css
+	this.soloNumeros        	= soloNumeros;    			//parametros: idCampo, msg, css
+	this.Entero        			= Entero;    				//parametros: idCampo, msg, css
+	this.Real        			= Real;    					//parametros: idCampo, msg, css
+	this.soloLetras         	= soloLetras;     			//parametros: idCampo, msg, css
+	this.variosCamposVacios 	= variosCamposVacios;   	//parametros: ver comentario de la funcion
+	this.IgualCero				=  IgualCero;
+	this.SelectorMultiple2  	= SelectorMultiple2;
+	this.DiferenteQue 			= DiferenteQue;
+	this.IgualQue 				= IgualQue;
+
+	this.TelefonoCompleto		= TelefonoCompleto;
+	this.longitud				= longitud;
+	this.SonNumeros				= SonNumeros;
+	this.TelefonoCorrecto		= TelefonoCorrecto;
+	this.Booleano 				= Booleano;
+	this.Unico					= Unico;
+	this.EsUnico				= EsUnico;
+	this.EsReal					= EsReal;
+	this.MostrarErrores			= MostrarErrores;
+
+	this.nerrores = 0;
+}
+
+
+
+function mensajeError()
+{
+	//this.msgError[0]     = "No se han introducido los datos correctamente";
+	this.MostrarErrores();
+	return this.msgError;
+
+	//alert(this.msgError + "\n \n Total de errores ("+ this.nerrores + ")");
+
+	//document.getElementById(this.campoRes).focus();
+}
+
+function MostrarErrores()
+{
+	for(var i=0; i<this.msgError.length ; i++)
+	{
+		var idCampo = new String(this.campos[i])
+        
+        if(document.getElementById('error'+idCampo)) 
+        {
+		    document.getElementById('error'+ idCampo).innerHTML = 
+			'<br><img vspace="5" hspace="5" src="../Imagenes/Varias/ErrorCampo.gif" style="vertical-align: middle"><font style="padding-left: 0px;">'+this.msgError[i]+'</font>'
+        }
+	}
+}
+
+function MostrarErrorIndividual(idCampo, mensaje)
+{
+    document.getElementById('error'+ idCampo).innerHTML = 
+            '<br><img vspace="5" hspace="5" src="../Imagenes/Varias/ErrorCampo.gif" style="vertical-align: middle"><font style="padding-left: 0px;">'+mensaje+'</font>'
+}
+
+
+function mensajeErrorInterno(functionName, comment)
+{
+	this.msgErrorInterno += functionName + comment;
+	this.msgError    = "Error Interno";
+	this.msgCorrecto = "Cero Errores";
+	this.errorInterno = true;
+	this.error        = true;
+	alert(this.msgErrorInterno);
+}
+
+
+function EliminarError()
+{
+
+	for(var i=1; i<arguments.length ; i++)
+	{
+		var idCampo = new String(''+arguments[1])
+		document.getElementById(arguments[i]).className= arguments[0]
+        
+        var idCampo = idCampo.replace("[]", "");  
+        
+        if(document.getElementById('error'+idCampo))                  
+            document.getElementById('error'+idCampo).innerHTML = ''
+	}
+    
+    $(".campo-error").html("")
+}
+
+
+function AgregarError(msg, idCampo)
+{
+	if(this.nerrores == 0)
+		this.campoRes = idCampo;
+
+	this.nerrores++;
+	this.error = true;
+	this.campos[this.msgError.length] = idCampo
+	this.msgError[this.msgError.length] = new String (''+arguments[0])
+	
+	for(var i=1; i < arguments.length ; i++)
+		document.getElementById(arguments[i]).className = this.errorClassName;
+}
+
+
+function IgualCero(idCampo, msg, css)
+{
+	if (this.errorInterno == true)
+		return false;  //si hay error interno no hace nada, sale directamente de la función
+
+	this.EliminarError(css, idCampo);
+
+	if (document.getElementById(idCampo).value == 0)
+	{
+		this.AgregarError(msg, idCampo);
+		return false;
+	}
+
+	return true;
+}
+
+
+function SelectorMultiple2(idCampo, msg, css)
+{
+	if(this.errorInterno == true)
+		return false;  //si hay error interno no hace nada, sale directamente de la función
+
+	this.EliminarError(css, idCampo);
+
+	if(document.getElementById(idCampo).options.length == 0)
+	{
+		this.AgregarError(msg, idCampo);
+		return false;
+	}
+
+	return true;
+}
+
+function DiferenteQue(idCampo, msg, css, valor)
+{
+	if (this.errorInterno == true)
+		return false;  //si hay error interno no hace nada, sale directamente de la función
+
+	this.EliminarError(css, idCampo);
+	
+	if(document.getElementById(idCampo).value == valor)
+	{
+		this.AgregarError(msg, idCampo);
+		return false;
+	}
+
+	return true;
+}
+
+
+function IgualQue(idCampo, msg, css, valor)
+{
+	if (this.errorInterno == true)
+		return false;  //si hay error interno no hace nada, sale directamente de la función
+
+	this.EliminarError(css, idCampo);
+
+	if(document.getElementById(idCampo).value != valor)
+	{
+		this.AgregarError(msg, idCampo);
+		return false;
+	}
+
+	return true;
+}
+
+function Comparacion(idCampo, msg, css, valor, operador)
+{
+	if (this.errorInterno == true)
+		return false;  //si hay error interno no hace nada, sale directamente de la función
+
+	this.EliminarError(css, idCampo);
+
+	if(eval("document.getElementById(idCampo).value"+ operador+ "valor"))
+	{
+		this.AgregarError(msg, idCampo);
+		return false;
+	}
+
+	return true;
+}
+
+
+function campoVacio(idCampo, msg, css)
+{
+	if(this.errorInterno == true)
+		return false;  
+
+	this.EliminarError(css, idCampo)
+		
+	document.getElementById(idCampo).value = document.getElementById(idCampo).value.replace(/^\s+/,'').replace(/\s+$/,'');
+
+	if((/^\s*$/.test(document.getElementById(idCampo).value)))
+	{
+		this.AgregarError(msg, idCampo);		
+		return false;
+	}
+	
+	return true;
+}
+
+function Url(idCampo, msg, css)
+{
+	if (this.errorInterno == true)
+		return false;  
+
+	this.EliminarError(css, idCampo);
+	document.getElementById(idCampo).value = document.getElementById(idCampo).value.replace(/^\s+/,'').replace(/\s+$/,'');
+
+	if (!(/^\w+(\.\w+)*\.\w{2,3}$/.test(document.getElementById(idCampo).value)))
+	{
+		this.AgregarError(msg, idCampo);
+		return false;
+	}
+
+	return true;
+}
+
+
+function campoVacioHtml(idCampo, msg, css)
+{
+	if (this.errorInterno == true)
+		return false;  //si hay error interno no hace nada, sale directamente de la función
+
+	this.EliminarError(css, idCampo);
+	document.getElementById(idCampo).value = document.getElementById(idCampo).value.replace(/^\s+/,'').replace(/\s+$/,'');
+
+	if ((/^\s*$/.test(tinyMCE.getInstanceById(idCampo).getBody().innerHTML)))
+	{
+		this.AgregarError(msg, idCampo);
+		return false;
+	}
+
+	return true;
+}
+
+
+function Email(idCampo, msg, css)
+{
+	if (this.errorInterno == true) 
+	return false;  
+
+	this.EliminarError(css, idCampo);
+
+	document.getElementById(idCampo).value = document.getElementById(idCampo).value.replace(/^\s+/,'').replace(/\s+$/,'');
+
+	if (document.getElementById(idCampo).value != "")
+	{
+
+		if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(document.getElementById(idCampo).value)))
+		{
+			this.AgregarError(msg, idCampo);	
+			return false;
+		}
+
+	}
+
+return true;
+}
+
+
+function longitudCampo(idCampo, operador, longitud, msg,  css)
+{
+
+	if (this.errorInterno == true) 
+		return false;  
+
+	this.EliminarError(css, idCampo);
+
+	//quitamos los posibles espacios en blanco
+	document.getElementById(idCampo).value = document.getElementById(idCampo).value.Trim();
+
+	if ( !(eval("document.getElementById(idCampo).value.length "+ operador +"longitud")) )
+	{
+		this.AgregarError(msg, idCampo);
+		return false;
+	}
+
+	return true;
+}
+
+
+function camposIguales(idCampo1, idCampo2, msg, css)
+{
+	if (this.errorInterno == true) 
+		return false;  
+
+	this.EliminarError(css, idCampo1, idCampo2);
+
+	if(document.getElementById(idCampo1).value != document.getElementById(idCampo2).value)
+	{
+		this.AgregarError(msg, idCampo1, idCampo2);
+		return false;
+	}
+
+	return true;
+}
+
+
+function soloNumeros(idCampo, msg, css)
+{
+	if (this.errorInterno == true) 
+		return false;  
+
+	this.EliminarError(css, idCampo);
+	document.getElementById(idCampo).value = document.getElementById(idCampo).value.replace(/^\s+/,'').replace(/\s+$/,'');
+
+	if(document.getElementById(idCampo).value != "")
+	{
+		if (!(/^[0-9]*.[0-9]*$/.test(document.getElementById(idCampo).value)))
+		{
+			this.AgregarError(msg, idCampo);
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+function Entero(idCampo, msg, css)
+{
+	if (this.errorInterno == true) 
+		return false;  //si hay error interno no hace nada, sale directamente de la función
+
+	this.EliminarError(css, idCampo);
+
+	document.getElementById(idCampo).value = document.getElementById(idCampo).value.replace(/^\s+/,'').replace(/\s+$/,'');
+
+	if(document.getElementById(idCampo).value != "")
+	{
+		if (!(/^(?:\+|-)?\d+$/.test(document.getElementById(idCampo).value)))
+		{
+			this.AgregarError(msg, idCampo);
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+function Real(idCampo, msg, css)
+{
+	if (this.errorInterno == true) 
+		return false;  
+
+	this.EliminarError(css, idCampo);
+	document.getElementById(idCampo).value = document.getElementById(idCampo).value.replace(/^\s+/,'').replace(/\s+$/,'');
+
+	if(document.getElementById(idCampo).value != "")
+	{
+		if (!(/^(?:\+|-)?\d+\.?\d*$/.test(document.getElementById(idCampo).value)))
+		{
+			this.AgregarError(msg, idCampo);
+			return false;
+		}
+	}
+
+return true;
+}
+
+function Booleano(idCampo, msg, css)
+{
+	if (this.errorInterno == true)
+		return false;
+
+	this.EliminarError(css, idCampo);
+
+	if(!document.getElementById(idCampo).checked)
+	{
+		this.AgregarError(msg, idCampo);
+		return false;
+	}
+
+
+	return true;
+}
+
+
+
+
+
+function soloLetras(idCampo, msg, css)
+{
+	if (this.errorInterno == true) 
+		return false; 
+
+
+
+	this.EliminarError(css, idCampo);
+	document.getElementById(idCampo).value = document.getElementById(idCampo).value.replace(/^\s+/,'').replace(/\s+$/,'');
+
+	if (!(/^([a-z\sáéíóúÁÉÍÓÚ])+$/i.test(document.getElementById(idCampo).value))){
+
+	this.AgregarError(msg, idCampo);
+
+	return false;
+
+}
+
+return true;
+
+}
+
+
+
+
+
+function bisiesto(fecha, formato)
+
+{
+
+	if (formato == "EURO") {
+
+		var dia  = fecha.substr(0,2);
+
+		var mes  = fecha.substr(3,2);
+
+		var anyo = fecha.substr(6,4);
+
+	}
+
+	else {
+
+		var dia  = fecha.substr(8,2);
+
+		var mes  = fecha.substr(5,2);
+
+		var anyo = fecha.substr(0,4);
+
+	}
+
+
+
+	if ( parseFloat(anyo)%4!=0 && mes=='02' && dia=='29') //no es bisiesto
+
+	return false;
+
+	else
+
+	return true;
+
+}
+
+
+
+
+
+function variosCamposVacios()
+
+{
+
+	if (this.errorInterno == true) return false;  //si hay error interno no hace nada, sale directamente de la función
+
+
+
+	for (var i=2; i < arguments.length ; i++){
+
+		document.getElementById(arguments[i]).className= arguments[1];
+
+		document.getElementById(arguments[i]).value = document.getElementById(arguments[i]).value.replace(/^\s+/,'').replace(/\s+$/,'');
+
+	}
+
+
+
+	var instruccion="(";
+
+	for (var i=2; i<arguments.length-1; i++)
+
+	instruccion += "(/^\s*$/.test(document.getElementById('"+arguments[i]+"').value)) && ";
+
+
+
+	instruccion += "(/^\s*$/.test(document.getElementById('"+arguments[arguments.length-1]+"').value)))";
+
+
+
+	if ( eval(instruccion) ){
+
+		this.error=true;
+
+		this.msgError += "\n" + arguments[0];
+
+
+
+		for (var i=2; i < arguments.length ; i++)
+
+		document.getElementById(arguments[i]).className = this.errorClassName;
+
+
+
+		return false;
+
+	}
+
+	return true;
+
+}
+
+
+
+
+
+/* Valida si el campo telefono esta escrito completamente */
+
+function TelefonoCompleto(idCampo, msg, css, extension)
+
+{
+
+	if (this.errorInterno == true)
+
+	return false;  //si hay error interno no hace nada, sale directamente de la función
+
+
+
+	idCampo1 = idCampo + "1"
+
+	idCampo2 = idCampo + "2"
+
+	idCampo3 = idCampo + "3"
+
+
+
+	this.EliminarError(css, idCampo1);
+
+	this.EliminarError(css, idCampo2);
+
+	this.EliminarError(css, idCampo3);
+
+
+
+	//quitamos los posibles espacios en blanco
+
+	document.getElementById(idCampo1).value = document.getElementById(idCampo1).value.Trim();
+
+	document.getElementById(idCampo2).value = document.getElementById(idCampo2).value.Trim();
+
+	document.getElementById(idCampo3).value = document.getElementById(idCampo3).value.Trim();
+
+
+
+	if ( !longitud(idCampo1, ">=", 3) )
+
+	document.getElementById( idCampo1 ).className = this.errorClassName;
+
+
+
+	if ( !longitud(idCampo2, ">=", 3) )
+
+	document.getElementById( idCampo2 ).className = this.errorClassName;
+
+
+
+	if ( !longitud(idCampo3, ">=", 4) )
+
+	document.getElementById( idCampo3 ).className = this.errorClassName;
+
+
+
+
+
+	if( extension == 1 )
+
+	{
+
+		idCampo4 = idCampo + "4"
+
+		this.EliminarError(css, idCampo4)
+
+	}
+
+
+
+	if ( !longitud(idCampo1, ">=", 3) || !longitud(idCampo2, ">=", 3) || !longitud(idCampo3, ">=", 4) )
+
+	{
+
+		this.AgregarError( msg );
+
+		return false;
+
+	}
+
+
+
+	return true;
+
+}
+
+
+
+
+
+/* Metodo que valida la longitud de un campo */
+
+function longitud(idCampo, operador, longitud)
+
+{
+
+	if (this.errorInterno == true)
+
+	return false;  //si hay error interno no hace nada, sale directamente de la función
+
+
+
+	if ( !(eval("document.getElementById(idCampo).value.length "+ operador +"longitud")) )
+
+	return false;
+
+
+
+	return true;
+
+}
+
+
+
+
+
+function SonNumeros(idCampo, css)
+
+{
+
+	if (this.errorInterno == true)
+
+	return false;  //si hay error interno no hace nada, sale directamente de la función
+
+
+
+	if( document.getElementById(idCampo).value != "" )
+
+	if (!(/^[0-9]*.[0-9]*$/.test(document.getElementById(idCampo).value)))
+
+	return false;
+
+
+
+	return true;
+
+}
+
+
+
+
+
+function TelefonoCorrecto(idCampo, msg, css, extension)
+
+{
+
+	idCampo1 = idCampo + "1"
+
+	idCampo2 = idCampo + "2"
+
+	idCampo3 = idCampo + "3"
+
+
+
+
+
+	this.EliminarError(css, idCampo1);
+
+	this.EliminarError(css, idCampo2);
+
+	this.EliminarError(css, idCampo3);
+
+
+
+
+
+	if ( !SonNumeros( idCampo1, css) )
+
+	document.getElementById( idCampo1 ).className = this.errorClassName;
+
+
+
+	if ( !SonNumeros( idCampo2, css ) )
+
+	document.getElementById( idCampo2 ).className = this.errorClassName;
+
+
+
+	if ( !SonNumeros( idCampo3, css ) )
+
+	document.getElementById( idCampo3 ).className = this.errorClassName;
+
+
+
+	if( extension == 1 )
+
+	{
+
+		idCampo4 = idCampo + "4"
+
+		this.EliminarError(css, idCampo4)
+
+
+
+		if ( !SonNumeros( idCampo4, css ) )
+
+		document.getElementById( idCampo4 ).className = this.errorClassName;
+
+
+
+		if ( !SonNumeros( idCampo1, css ) || !SonNumeros( idCampo2, css ) || !SonNumeros( idCampo3, css ) || !SonNumeros( idCampo4, css ) )
+
+		{
+
+			this.AgregarError( msg );
+
+			return false;
+
+		}
+
+	}
+
+	else
+
+	if ( !SonNumeros( idCampo1, css ) || !SonNumeros( idCampo2, css ) || !SonNumeros( idCampo3, css ) )
+
+	{
+
+		this.AgregarError( msg );
+
+		return false;
+
+	}
+
+
+
+	return true;
+
+}
+
+
+
+
+
+/*devuelve 1 sino existe el registro, 0 si existe*/
+
+function EsUnico(cxdatos, tabla, idCampo, campo)
+{
+	var _objetus = objetus()	
+	
+	valor = document.getElementById(idCampo).value
+		
+	_values_send =  "op=Unico"
+	_values_send += "&tabla="+tabla
+	_values_send += "&campo="+campo
+	_values_send += "&valor="+valor
+	_values_send += "&cxdatos="+cxdatos
+	_values_send += "&timestamp="+FechaHora()	
+	   	
+    _URL_="Validacion.php?"		
+	dir = _URL_+_values_send	 
+	
+    _objetus.open("POST", dir, true);
+    
+    _objetus.onreadystatechange=function() 
+		{
+		if(_objetus.readyState==1 || _objetus.readyState==2 || _objetus.readyState==3)
+			CargandoUnico(idCampo)
+			
+		if(_objetus.readyState==4)
+			FinalizarUnico(_objetus.status, _objetus.responseText, idCampo)	
+    	}	 
+	
+    _objetus.send(null);  	 
+}
+
+function CargandoUnico( idCampo)	
+{
+	document.getElementById('error'+idCampo).innerHTML = 
+		'<br><img vspace="5" hspace="5" src="../Imagenes/Varias/Cargando.gif" style="vertical-align: middle"><font style="padding-top: 15px; padding-left: 0px;">Validando..</font>'
+}
+
+function FinalizarUnico(respuesta, texto, idCampo)	
+{
+	if(respuesta == 200)
+	{
+		
+		if(texto == 0 || texto == "0")
+		{
+			document.getElementById('error'+idCampo).innerHTML = 
+			'<br><img vspace="5" hspace="5" src="../Imagenes/Varias/ErrorCampo.gif" style="vertical-align: middle"><font style="padding-top: 15px; padding-left: 0px;">El campo debe ser único</font>'
+		}
+		else
+		{
+			document.getElementById('error'+idCampo).innerHTML = ''
+		}
+	}
+	
+}
+
+function Unico(idCampo, msg, css, tabla, campo, cxdatos)
+{
+
+	if (this.errorInterno == true)
+		return false;  
+
+	this.EliminarError(css, idCampo);
+	document.getElementById(idCampo).value = document.getElementById(idCampo).value.replace(/^\s+/,'').replace(/\s+$/,'');
+	
+	
+	EsUnico(cxdatos, tabla, idCampo, campo);
+
+	return false;
+}
+
+
+function EsReal(idCampo)
+
+{
+
+	document.getElementById(idCampo).value = document.getElementById(idCampo).value.replace(/^\s+/,'').replace(/\s+$/,'');
+
+
+
+	if(document.getElementById(idCampo).value != "")
+
+	if (!(/^(?:\+|-)?\d+\,?\d*$/.test(document.getElementById(idCampo).value.replace(",",""))))
+
+	return false;
+
+
+
+	return true;
+
+}
+
+
+/*********************************************************************/
+/*  EL SIGUIENTE CÓDIGO NO PERTENERCE A LA CLASE, AUNQUE EN LA CLASE SE UTILIZA. */
+/*********************************************************************
+
+
+
+Al utilizar mucho expresion regular para quitar los espacios en blanco
+
+he decidido añadir varios métodos que los eliminan  de las cadenas
+
+En algunas funciones utiliza las funciones aqui descritas y en otras <pre></pre>
+
+utiliza la expresion regular. Ambas son válidas.
+
+Son los siguientes:
+
+
+
+/*********************************************************************/
+
+/* Trim(), LTrim(), RTrim() */
+
+/* Metodos que eliminan los espacios en blanco de una cadena */
+
+String.prototype.Trim = function()
+{
+	return this.replace(/\s+$|^\s+/g,"");
+}
+
+String.prototype.LTrim = function()
+{
+	return this.replace(/^\s+/,"");
+}
+
+String.prototype.RTrim = function()
+{
+	return this.replace(/\s+$/,"");
+}

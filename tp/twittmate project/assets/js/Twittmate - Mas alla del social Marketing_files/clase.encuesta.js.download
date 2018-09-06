@@ -1,0 +1,87 @@
+function VotarEncuesta(idencuesta)
+{  
+    var idopcion = $("input[name='idopcion"+idencuesta+"']:checked").val()
+    
+    $("#contenedor-encuesta"+idencuesta).append("<div id=\"cargador-encuesta"+idencuesta+"\" class=\"loading-claro\"></div>");
+    
+    $.ajax({
+      url: "Encuestas.php?op=FormVotarEncuesta&noheaders=all&idencuesta="+idencuesta+"&idopcion="+idopcion,
+      cache: false,
+      success: function(html){
+          
+        $("#cargador-encuesta"+idencuesta).remove()
+          
+        if(html == "18")                                           
+            alert("No puede votar tan seguido")                    
+        else if(html == "30")        
+            alert("Error al registrar su voto, intentelo de nuevo")
+        else                                       
+            $("#contenedor-encuesta"+idencuesta).html(html).hide().fadeIn('slow')   
+                      
+      }
+    });   
+}
+
+function VotarEncuestaMultiple(idencuesta)
+{  
+    var idopcion = $("input[name='idopcion"+idencuesta+"']:checked").val()
+    
+    var chequeados = new Array()
+    
+    $("#contenedor-encuesta"+idencuesta+" .opciones-encuestas").each(function(i){
+        
+        var checked = $(this).attr('checked')
+        var valor = $(this).val()   
+        
+        if(checked)
+        {
+            chequeados[i] = valor
+        }    
+ 
+    });
+    
+    if(chequeados.length == 0)
+    {
+        alert("Selecciona una opción")
+        return;
+    }
+    
+    var seleccionados = implode(chequeados, ",")
+    
+    $("#contenedor-encuesta"+idencuesta).append("<div id=\"cargador-encuesta"+idencuesta+"\" class=\"loading-claro\"></div>");
+    
+    
+    $.ajax({
+      url: "Encuestas.php?op=VotarEncuestaMultiple&noheaders=all&idencuesta="+idencuesta+"&idopcion="+seleccionados,
+      cache: false,
+      success: function(html){
+          
+        $("#cargador-encuesta"+idencuesta).remove()
+          
+        if(html == "18")                                           
+            alert("No puede votar tan seguido")                    
+        else if(html == "30")        
+            alert("Error al registrar su voto, intentelo de nuevo")
+                      
+      }
+    }); 
+}
+
+function implode(seleccionados, separador){
+    var contenido = "";
+        
+    i=0;
+    for (x in seleccionados){           
+        if(i==0)
+            separador = "";
+        else
+            separador = ",";
+        
+        if(x != ""){
+            contenido = contenido + "" +separador +""+ seleccionados[x];
+            i++;
+        }
+            
+    }                
+    return contenido;
+}

@@ -1,0 +1,46 @@
+/*
+    Esta función actualiza el div DIVACTUALIZAR con el retorno del url URLCONTENIDO
+*/
+function ActualizarDiv(divactualizar, urlcontenido)
+{         
+   PeticionActualizarDiv(divactualizar, urlcontenido)  
+}
+
+function PeticionActualizarDiv(divactualizar, urlcontenido)
+{
+    var _objetus = objetus()         
+    
+    _values_send = "&timestamp="+FechaHora()  
+
+    _URL_= urlcontenido        
+    dir = _URL_+_values_send
+    
+    _objetus.open("GET", dir, true);
+    
+    _objetus.onreadystatechange=function() 
+        {
+        if(_objetus.readyState==1 || _objetus.readyState==2 || _objetus.readyState==3)
+            CargandoActualizarDiv()
+            
+        if(_objetus.readyState==4)
+            FinalizarActualizarDiv(_objetus.status, _objetus.responseText, divactualizar)    
+        }     
+    
+    _objetus.send(null);       
+}
+
+
+function CargandoActualizarDiv()    
+{
+    
+}
+
+
+function FinalizarActualizarDiv(respuesta, texto, divactualizar)    
+{
+    if(respuesta == 200)
+    {
+       document.getElementById(divactualizar).innerHTML = texto
+    }      
+}    
+                     

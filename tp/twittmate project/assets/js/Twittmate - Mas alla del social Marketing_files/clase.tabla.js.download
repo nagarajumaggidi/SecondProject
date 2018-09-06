@@ -1,0 +1,4 @@
+function CerrarTabla(idtabla)
+{
+	MostrarOcultar(idtabla)
+}

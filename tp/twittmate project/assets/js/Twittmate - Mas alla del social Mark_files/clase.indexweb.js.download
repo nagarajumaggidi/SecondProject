@@ -1,0 +1,255 @@
+var wvideo= 651;
+var hvideo= 374;
+var scrollContent;
+var scrollPane;
+var prevY = null;
+
+
+jQuery(document).ready(function() {
+	
+	//Faqs
+	$("#index .faqs .cont .lista .faq p").click(function(){
+		$(this).parent().find(".respuesta").toggle("normal")
+	});
+        
+        $('#ventana-infocarta').modal('show');
+    
+    $("#ventana-infocarta a").click(function(){
+        $('#ventana-infocarta').modal('hide');
+        return false;
+    });
+	
+    $("#ventana-inicio").show()
+    $("#ventana-inicio").dialog({
+        autoOpen : true,
+        height : 480,
+        width : 700,
+        modal : true,
+        
+        buttons : {
+            'Ok' : function() {
+                $(this).dialog("close");
+            }
+        }
+    });
+  		
+	//Videos
+    var idvideo = $("#id-video").val();
+    var video = $("#video"+idvideo +" a");
+    var str;
+    
+
+    CambiarInfoVideo();   	
+
+    $(".contenedor-video a").click(function(event) 
+    {    
+        str = new String($(this).parent().attr("id"))
+        $("#id-video").val(str.slice(5));   
+
+        var video = $(this);
+        DespuesAnimacion(video);
+        return false;
+    });
+    
+    
+    //Boletin
+    $("#email_Boletin").click(function(){
+        if($(this).val()=="Suscríbete...")
+            $(this).val("")        
+    }).blur(function(){
+        if($(this).val()=="")
+            $(this).val("Suscríbete...")
+    });
+    
+       
+	
+	$("#index .seccion1 .video .controles .siguiente").click(function(){
+		 var video = $("#index .lista-videos .contenedor-video.selected").next()
+		 if($(video).index()<0)
+		 	  video = $("#index .lista-videos .contenedor-video").eq(0)
+		 video = $(video).find("a").eq(0)
+		 IniciarVideo(video);
+	});
+	
+	$("#index .seccion1 .video .controles .anterior").click(function(){
+		 var video = $("#index .lista-videos .contenedor-video.selected").prev()
+		 if($(video).index()<0)
+		 	  video = $("#index .lista-videos .contenedor-video").eq($("#index .lista-videos .contenedor-video").length-1)
+		 video = $(video).find("a").eq(0)
+		 IniciarVideo(video);
+	});
+	
+	$("#index .seccion1 .desde").click(function(){
+		$('html, body').animate({scrollTop:1530}, 'slow');	
+	});
+	
+	//Autoresponder
+	/*
+	$("#index .subscripcion .boton1").click(function(){
+		
+		if($("#nombre-suscribir").val()=="")
+		{
+			alert("Debe escribir un nombre")
+			return false;
+		}
+		
+		if($("#email-suscribir").val()=="")
+		{
+			alert("Debe escribir un email")
+			return false;
+		}
+		
+		$.ajax({
+			type: "POST",
+			url: "http://www.webmailresponder.com/forms/registro_suscriptor.php",
+			data: $("#form-suscribir").serialize(),
+			error: function(datos){
+			   alert("Se han enviado los datos con éxito!");                   			   
+			},
+			success: function(datos){
+			   alert("Se han enviado los datos con éxito!");                   			   
+			}
+		});
+	});
+	*/
+		
+});
+
+
+
+
+
+function mycarousel_initCallback(carousel)
+{
+    carousel.clip.hover(function() {
+        carousel.stopAuto();
+    }, function() {
+        carousel.startAuto();
+    });
+    
+    jQuery('#index .slide .c-controles a.boton').bind('click', function() {   
+         
+        $("#index .slide .c-controles a.boton").removeClass("selected")
+        var index = parseInt($(this).index())
+        $("#index .slide .c-controles a.boton"+(index+1)).addClass("selected")
+        carousel.scroll(index+1)
+        carousel.startAuto(0);
+        return false;
+    });
+    
+};
+
+
+
+     
+function DespuesAnimacion(video)
+{
+    CambiarInfoVideo();
+    IniciarVideo(video);    
+}
+
+
+function IniciarVideo(video)
+{
+    var player = null;
+	$("#index .lista-videos .contenedor-video").removeClass("selected")	
+	$(video).parent().addClass("selected")
+
+
+    if (video.hasClass("flv"))
+    {
+
+        player = flashembed("reproductor-video", 
+            {
+                src:'Swf/FlowPlayerDark.swf',
+                width: wvideo, 
+                height: hvideo,
+                controls:null,
+				wmode: 'transparent'
+            },     
+            {
+                config: {  
+                    autoPlay: false,
+                    autoBuffering: false, 
+                    loop:false, 
+                    clip: { autoPlay: false,
+                    autoBuffering: true},
+                    initialScale:'scale',
+                    videoFile: video.attr("href")
+                }
+
+            }
+        );   
+    }
+
+    else if(video.hasClass("swf") || video.hasClass("youtube"))
+    {          
+        player = flashembed("reproductor-video", 
+        {             
+            src: video.attr("href"),
+            width: wvideo, 
+            height: hvideo,
+            controls:null,
+			wmode: 'transparent'
+        } 
+
+        );   
+    }
+	 else if(video.hasClass("vimeo"))
+    {          
+       $("#reproductor-video").html('<iframe src="'+video.attr("href")+'?badge=0" width="'+wvideo+'" height="'+hvideo+'" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe> <p><a href="http://vimeo.com/31158028">MADE IN ICELAND</a> from <a href="http://vimeo.com/klaraharden">Klara Harden</a> on <a href="http://vimeo.com">Vimeo</a>.</p>')
+    }
+    else
+    {
+         player = flashembed("reproductor-video", 
+            {
+                src:'Swf/FlowPlayerDark.swf',
+                width: wvideo, 
+                height: hvideo,
+                controls:null,
+				wmode: 'transparent'
+            },    
+            {
+                config: {  
+
+                    autoPlay: false,
+                    autoBuffering: false, 
+                    loop:false, 
+                    clip: { autoPlay: false,
+                    autoBuffering: true},
+                    initialScale:'scale',
+                    videoFile: video.attr("href")
+                    //hideControls: true
+
+                }                
+            }
+        );    
+    }
+}
+
+
+function CambiarInfoVideo()
+{
+    var idvideo = $("#id-video").val(); 
+
+    $.ajax(
+    {
+
+        url: "Video.php?op=InfoVideo&noheaders=all&idvideo="+idvideo+"&textotitular=100",
+        async:true,
+        cache:false,
+        dataType:"html",
+        
+
+        success: function(datos){
+            $(".informacion").empty().fadeOut('fast');
+            $(".informacion").append(datos).fadeIn('slow');
+            var idvideo = $("#id-video").val();
+            var video = $("#video"+idvideo +" a").eq(0);
+	        var str;  
+            IniciarVideo(video);
+        },
+        timeout: 10000  
+    });          
+
+}
